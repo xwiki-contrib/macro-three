@@ -31,11 +31,11 @@
   <artifactId>macro-three</artifactId>
   <version>1.2-SNAPSHOT</version>
   <packaging>xar</packaging>
-  <name>Three Macro</name>
-  <description>A macro for loading and displaying 3D objects in an XWiki page.</description>
+  <name>Macro Three</name>
+  <description>A macro for loading and displaying 3D objects in XWiki.</description>
 
   <properties>
-    <xwiki.extension.name>Three Macro</xwiki.extension.name>
+    <xwiki.extension.name>Macro Three</xwiki.extension.name>
     <xwiki.extension.category>macro</xwiki.extension.category>
     <xwiki.release.jira.skip>false</xwiki.release.jira.skip>
     <xwiki.issueManagement.jira.id>THREE</xwiki.issueManagement.jira.id>

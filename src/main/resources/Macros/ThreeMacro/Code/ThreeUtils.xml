@@ -260,7 +260,7 @@ requirejs.config({
     container.appendChild(renderer.domElement);
 
     // Camera
-    const camera = new THREE.PerspectiveCamera(45, containerWidth / containerHeight, 1, 10000);
+    const camera = new THREE.PerspectiveCamera(45, containerWidth / containerHeight, 1, 100000);
     const cameraZ = $(container).data('zoomOut') ? $(container).data('zoomOut') : 30;
     camera.position.set(0, 0, cameraZ);
     camera.lookAt(0, 0, 0);
@@ -287,7 +287,7 @@ requirejs.config({
     if (bgColor) {
       scene.background = new THREE.Color(bgColor)
     }
-    scene.add(new THREE.AmbientLight(0xffffff));
+    scene.add(new THREE.AmbientLight(0xf5f5f5));
 
     // Load the object
     const file = $(container).data('file');
@@ -342,6 +342,13 @@ requirejs.config({
       renderer.render(scene, camera);
     };
     animate();
+
+    // Set size on window resize
+    window.addEventListener( 'resize', () =&gt; {
+      camera.aspect = $(container).width() / $(container).height();
+      camera.updateProjectionMatrix();
+      renderer.setSize($(container).width(), $(container).height());
+    }, false );
   });
 
 });</code>
