@@ -242,6 +242,10 @@ requirejs.config({
     </property>
     <property>
       <code>require(['jquery', 'THREE_global', 'OBJLoader', 'GLTFLoader', 'OrbitControls'], function ($) {
+  // GLTF Loader
+  const gltfLoader = new THREE.GLTFLoader();
+  // OBJ Loader
+  const objLoader = new THREE.OBJLoader();
 
   // Initialize the three.js elements
   function init(container) {
@@ -256,7 +260,7 @@ requirejs.config({
     container.appendChild(renderer.domElement);
 
     // Camera
-    const camera = new THREE.PerspectiveCamera(45, containerWidth / containerHeight, 1, 1000);
+    const camera = new THREE.PerspectiveCamera(45, containerWidth / containerHeight, 1, 10000);
     const cameraZ = $(container).data('zoomOut') ? $(container).data('zoomOut') : 30;
     camera.position.set(0, 0, cameraZ);
     camera.lookAt(0, 0, 0);
@@ -297,31 +301,34 @@ requirejs.config({
 
   // Load the object from file
   function loadObject(file, type, onObjectLoaded) {
-    let fileType;
-    if (!type) {
-      fileType = file.split(/[#?]/)[0].split('.').pop().trim();
-    } else {
-      fileType = type.toLowerCase();
-    }
-    if (fileType === 'gltf') {
-      // The file is GLTF
-      const loader = new THREE.GLTFLoader();
-      loader.load(file, (gltf) =&gt; {
-        onObjectLoaded(gltf.scene);
-      }, undefined, (error) =&gt; {
-        new XWiki.widgets.Notification('Could not load GLTF file. ' + error, 'error');
-      });
-    } else if (fileType === 'obj') {
-      // The file is GLTF
-      const loader = new THREE.OBJLoader();
-      loader.load(file, (obj) =&gt; {
-        onObjectLoaded(obj);
-      }, undefined, (error) =&gt; {
-        new XWiki.widgets.Notification('Could not load OBJ file. ' + error, 'error');
-      });
-    } else {
-      new XWiki.widgets.Notification('Error loading object. Format not supported. Try defining the type parameter in the macro.', 'error');
-    }
+    // Go over each file because files might be multiple
+    file.split(',').forEach(singleFile =&gt; {
+      singleFile = singleFile.trim();
+      let fileType;
+      if (!type) {
+        fileType = singleFile.split(/[#?]/)[0].split('.').pop().trim();
+      } else {
+        fileType = type.toLowerCase();
+      }
+
+      if (fileType === 'gltf') {
+        // The file is GLTF
+        gltfLoader.load(singleFile, (gltf) =&gt; {
+          onObjectLoaded(gltf.scene);
+        }, undefined, (error) =&gt; {
+          new XWiki.widgets.Notification('Could not load GLTF file. ' + singleFile + '.', 'error');
+        });
+      } else if (fileType === 'obj') {
+        // The file is GLTF
+        objLoader.load(singleFile, (obj) =&gt; {
+          onObjectLoaded(obj);
+        }, undefined, (error) =&gt; {
+          new XWiki.widgets.Notification('Could not load OBJ file. ' + singleFile + '.', 'error');
+        });
+      } else {
+        new XWiki.widgets.Notification('Error loading object. Format not supported. Try defining the type parameter in the macro.', 'error');
+      }
+    });
   }
 
   // Initialize each container

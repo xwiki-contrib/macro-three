@@ -233,10 +233,10 @@
       <code>{{velocity}}
 ## Include the three.js utils
 #if ($xcontext.action != 'edit')
-
+  ## Import jsx and ssx
   #set ($discard = $xwiki.jsx.use('Macros.ThreeMacro.Code.ThreeUtils'))
   #set ($discard = $xwiki.ssx.use('Macros.ThreeMacro.Code.ThreeUtils'))
-
+  ## Get width and height
   #set ($width = $wikimacro.parameters.width)
   #set ($height = $wikimacro.parameters.height)
   ## Add "px" if the width or height are plain numbers
@@ -246,21 +246,49 @@
   #if ($numbertool.toNumber($height).toString().equals($height))
     #set ($height = "${height}px")
   #end
-
   ## Check if the file is specified to be an attachment
   #if ($wikimacro.parameters.attachment)
+    ## Use the specified document for attachments if it is given else use the current document
     #if ($wikimacro.parameters.document)
       #set ($attachmentDoc = $xwiki.getDocument($wikimacro.parameters.document))
+    #else
+      #set ($attachmentDoc = $doc)
+    #end
+    ## Check if we have multiple files or a single file
+    #if ($wikimacro.parameters.file)
       #set ($file = $attachmentDoc.getAttachmentURL($wikimacro.parameters.file))
     #else
-      #set ($file = $doc.getAttachmentURL($wikimacro.parameters.file))
+      #set ($files = $wikimacro.parameters.files.split(','))
+      #set ($file = '')
+      ## Iterate over all the files and get their attachment URLs
+      #foreach ($singleFile in $files)
+        #set ($singleFile = $attachmentDoc.getAttachmentURL($singleFile.trim()))
+        #if ($foreach.count == 1)
+          #set ($file = "${singleFile}")
+        #else
+          #set ($file = "${file},${singleFile}")
+        #end
+      #end
     #end
   #else
-    #set ($file = $wikimacro.parameters.file)
+    ## If the file or files are not an attachment
+    #if ($!wikimacro.parameters.file)
+      #set ($file = $wikimacro.parameters.file)
+    #else
+      #set ($files = $wikimacro.parameters.files.split(','))
+      #set ($file = '')
+      ## Iterate over all the files and get their attachment URLs
+      #foreach ($singleFile in $files)
+        #set ($singleFile = $singleFile.trim())
+        #if ($foreach.count == 1)
+          #set ($file = "${singleFile}")
+        #else
+          #set ($file = "${file},${singleFile}")
+        #end
+      #end
+    #end
   #end
-
   #set ($canvasId = $util.generateRandomString(5))
-
   (%
     id="threeCanvas${canvasId}"
     class="macro-three-container"
@@ -273,7 +301,6 @@
     data-auto-rotate="$!wikimacro.parameters.autoRotate"
     data-auto-rotate-speed="$!wikimacro.parameters.autoRotateSpeed"
   %)((($!wikimacro.content)))
-
 #end
 {{/velocity}}</code>
     </property>
@@ -374,7 +401,7 @@
       <description>3D object file to load. Supported formats are .obj, .gltf.</description>
     </property>
     <property>
-      <mandatory>1</mandatory>
+      <mandatory>0</mandatory>
     </property>
     <property>
       <name>file</name>
@@ -1005,6 +1032,84 @@
     </property>
     <property>
       <type>java.lang.Float</type>
+    </property>
+  </object>
+  <object>
+    <name>Macros.ThreeMacro.WebHome</name>
+    <number>9</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>d58edf3a-adbb-4ccf-a55c-a2a151c80288</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>Multiple 3D object files to load separated by comma. Supported formats are .obj, .gltf.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>files</name>
+    </property>
+    <property>
+      <type>java.lang.String</type>
     </property>
   </object>
 </xwikidoc>
