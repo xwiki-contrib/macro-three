@@ -281,15 +281,7 @@ requirejs.config({
       scene.add(object);
     });
 
-    return [renderer, scene, camera];
-  }
-
-  // Animate the scene
-  function animate(renderer, scene, camera) {
-    requestAnimationFrame(() =&gt; {
-      animate(renderer, scene, camera);
-    });
-    renderer.render(scene, camera);
+    return [renderer, controls, scene, camera];
   }
 
   // Load the object from file
@@ -323,8 +315,15 @@ requirejs.config({
 
   // Initialize each container
   $$('.macro-three-container').each((container) =&gt; {
-    const [renderer, scene, camera] = init(container);
-    animate(renderer, scene, camera);
+    const [renderer, controls, scene, camera] = init(container);
+
+    // Animate the scene
+    const animate = function() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    };
+    animate();
   });
 
 });</code>
