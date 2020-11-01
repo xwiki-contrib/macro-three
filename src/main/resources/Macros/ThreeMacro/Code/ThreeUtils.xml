@@ -124,9 +124,23 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>requirejs.config({
+      <code>// Defining THREE globally so three.js can be consumed by the loaders and other files
+define('THREE_global', ['$services.webjars.url("org.webjars.npm:three", "build/three.min.js")'], function(THREE) {
+    // three.js modules require global THREE:
+    window.THREE = THREE;
+    return THREE;
+});
+
+requirejs.config({
   paths: {
-    'three': ['$services.webjars.url("org.webjars.npm:three", "build/three.min.js")']
+    'OBJLoader': ['$services.webjars.url("org.webjars.npm:three", "examples/js/loaders/OBJLoader.js")'],
+    'GLTFLoader': ['$services.webjars.url("org.webjars.npm:three", "examples/js/loaders/GLTFLoader.js")'],
+    'OrbitControls': ['$services.webjars.url("org.webjars.npm:three", "examples/js/controls/OrbitControls.js")']
+  },
+  shim: {
+    'OBJLoader': ['THREE_global'],
+    'GLTFLoader': ['THREE_global'],
+    'OrbitControls': ['THREE_global']
   }
 });</code>
     </property>
@@ -227,8 +241,92 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['three', 'jquery'], function (THREE, $) {
-  console.log(THREE.REVISION);
+      <code>require(['jquery', 'THREE_global', 'OBJLoader', 'GLTFLoader', 'OrbitControls'], function ($) {
+
+  // Initialize the three.js elements
+  function init(container) {
+    // Container
+    const containerWidth = $(container).width();
+    const containerHeight = $(container).height();
+
+    // Renderer
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(containerWidth, containerHeight);
+    container.appendChild(renderer.domElement);
+
+    // Camera
+    const camera = new THREE.PerspectiveCamera(45, containerWidth / containerHeight, 1, 1000);
+    const cameraZ = $(container).data('zoomOut') ? $(container).data('zoomOut') : 30;
+    camera.position.set(0, 0, cameraZ);
+    camera.lookAt(0, 0, 0);
+
+    // Orbit Controls
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableZoom = true;
+    controls.autoRotate = false;
+
+    // Scene
+    const scene = new THREE.Scene();
+    const bgColor = $(container).data('background');
+    if (bgColor) {
+      scene.background = new THREE.Color(bgColor)
+    }
+    scene.add(new THREE.AmbientLight(0xffffff));
+
+    // Load the object
+    const file = $(container).data('file');
+    const type = $(container).data('type');
+    loadObject(file, type, (object) =&gt; {
+      scene.add(object);
+    });
+
+    return [renderer, scene, camera];
+  }
+
+  // Animate the scene
+  function animate(renderer, scene, camera) {
+    requestAnimationFrame(() =&gt; {
+      animate(renderer, scene, camera);
+    });
+    renderer.render(scene, camera);
+  }
+
+  // Load the object from file
+  function loadObject(file, type, onObjectLoaded) {
+    let fileType;
+    if (!type) {
+      fileType = file.split(/[#?]/)[0].split('.').pop().trim();
+    } else {
+      fileType = type.toLowerCase();
+    }
+    if (fileType === 'gltf') {
+      // The file is GLTF
+      const loader = new THREE.GLTFLoader();
+      loader.load(file, (gltf) =&gt; {
+        onObjectLoaded(gltf.scene);
+      }, undefined, (error) =&gt; {
+        new XWiki.widgets.Notification('Could not load GLTF file. ' + error, 'error');
+      });
+    } else if (fileType === 'obj') {
+      // The file is GLTF
+      const loader = new THREE.OBJLoader();
+      loader.load(file, (obj) =&gt; {
+        onObjectLoaded(obj);
+      }, undefined, (error) =&gt; {
+        new XWiki.widgets.Notification('Could not load OBJ file. ' + error, 'error');
+      });
+    } else {
+      new XWiki.widgets.Notification('Error loading object. Format not supported. Try defining the type parameter in the macro.', 'error');
+    }
+  }
+
+  // Initialize each container
+  $$('.macro-three-container').each((container) =&gt; {
+    const [renderer, scene, camera] = init(container);
+    animate(renderer, scene, camera);
+  });
+
 });</code>
     </property>
     <property>
@@ -236,6 +334,128 @@
     </property>
     <property>
       <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>Macros.ThreeMacro.Code.ThreeUtils</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>112df4ac-d21d-4ba4-8e4f-d7fbae170476</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.macro-three-container canvas {
+  outline: none;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name>three-style</name>
+    </property>
+    <property>
+      <parse>0</parse>
     </property>
     <property>
       <use>onDemand</use>

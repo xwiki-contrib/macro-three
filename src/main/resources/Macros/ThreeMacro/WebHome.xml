@@ -231,27 +231,47 @@
     </property>
     <property>
       <code>{{velocity}}
-## Include the three.js library
+## Include the three.js utils
 #if ($xcontext.action != 'edit')
+
   #set ($discard = $xwiki.jsx.use('Macros.ThreeMacro.Code.ThreeUtils'))
   #set ($discard = $xwiki.ssx.use('Macros.ThreeMacro.Code.ThreeUtils'))
-#end
 
-#set ($width = $wikimacro.parameters.width)
-#set ($height = $wikimacro.parameters.height)
-## Add "px" if the width or height are plain numbers
-#if ($numbertool.toNumber($width).toString().equals($width))
-  #set ($width = "${width}px")
-#end
-#if ($numbertool.toNumber($height).toString().equals($height))
-  #set ($height = "${height}px")
-#end
+  #set ($width = $wikimacro.parameters.width)
+  #set ($height = $wikimacro.parameters.height)
+  ## Add "px" if the width or height are plain numbers
+  #if ($numbertool.toNumber($width).toString().equals($width))
+    #set ($width = "${width}px")
+  #end
+  #if ($numbertool.toNumber($height).toString().equals($height))
+    #set ($height = "${height}px")
+  #end
 
-#set ($canvasId = $util.generateRandomString(5))
+  ## Check if the file is specified to be an attachment
+  #if ($wikimacro.parameters.attachment)
+    #if ($wikimacro.parameters.document)
+      #set ($attachmentDoc = $xwiki.getDocument($wikimacro.parameters.document))
+      #set ($file = $attachmentDoc.getAttachmentURL($wikimacro.parameters.file))
+    #else
+      #set ($file = $doc.getAttachmentURL($wikimacro.parameters.file))
+    #end
+  #else
+    #set ($file = $wikimacro.parameters.file)
+  #end
 
-(% id="threeCanvas${canvasId}" class="three-canvas" style="width: ${width}; height: ${height}" %)(((
-$!wikimacro.content
-)))
+  #set ($canvasId = $util.generateRandomString(5))
+
+  (%
+    id="threeCanvas${canvasId}"
+    class="macro-three-container"
+    style="width: ${width}; height: ${height}"
+    data-file="${file}"
+    data-type="$!wikimacro.parameters.type"
+    data-zoom-out="$!wikimacro.parameters.defaultZoomOut"
+    data-background="$!wikimacro.parameters.background"
+  %)((($!wikimacro.content)))
+
+#end
 {{/velocity}}</code>
     </property>
     <property>
@@ -273,7 +293,7 @@ $!wikimacro.content
       <id>three</id>
     </property>
     <property>
-      <name>Three</name>
+      <name>Three Macro</name>
     </property>
     <property>
       <supportsInlineMode>0</supportsInlineMode>
@@ -357,7 +377,7 @@ $!wikimacro.content
       <name>file</name>
     </property>
     <property>
-      <type/>
+      <type>java.lang.String</type>
     </property>
   </object>
   <object>
@@ -501,7 +521,7 @@ $!wikimacro.content
       </type>
     </class>
     <property>
-      <defaultValue>300px</defaultValue>
+      <defaultValue>400px</defaultValue>
     </property>
     <property>
       <description>Width of the canvas.</description>
@@ -514,6 +534,240 @@ $!wikimacro.content
     </property>
     <property>
       <type/>
+    </property>
+  </object>
+  <object>
+    <name>Macros.ThreeMacro.WebHome</name>
+    <number>3</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>8271abde-e2a2-4c74-9376-1a05d031b918</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
+    </class>
+    <property>
+      <defaultValue>false</defaultValue>
+    </property>
+    <property>
+      <description>If the "file" is an attachment or not.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>attachment</name>
+    </property>
+    <property>
+      <type>java.lang.Boolean</type>
+    </property>
+  </object>
+  <object>
+    <name>Macros.ThreeMacro.WebHome</name>
+    <number>4</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>76f038ea-f867-471a-a560-179cff9f448d</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>Requires "attachment" to be "true". The document to look into for attachment. Looks in current document by default.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>document</name>
+    </property>
+    <property>
+      <type>org.xwiki.model.reference.DocumentReference</type>
+    </property>
+  </object>
+  <object>
+    <name>Macros.ThreeMacro.WebHome</name>
+    <number>5</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>9287330e-27d3-46e8-a299-5c5c9bfdf497</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
+    </class>
+    <property>
+      <defaultValue>30</defaultValue>
+    </property>
+    <property>
+      <description>Default value of how zoomed out (far) the camera initially is from the object.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>defaultZoomOut</name>
+    </property>
+    <property>
+      <type>java.lang.Integer</type>
     </property>
   </object>
 </xwikidoc>
