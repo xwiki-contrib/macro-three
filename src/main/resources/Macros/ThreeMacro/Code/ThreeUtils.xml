@@ -265,6 +265,17 @@ requirejs.config({
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableZoom = true;
     controls.autoRotate = false;
+    // If the controls are to be disabled
+    if ($(container).data('disableControls')) {
+      controls.enabled = false;
+    }
+    // Setting up auto rotate from macro parameters
+    if ($(container).data('autoRotate')) {
+      controls.autoRotate = true;
+      if ($(container).data('autoRotateSpeed')) {
+        controls.autoRotateSpeed = $(container).data('autoRotateSpeed');
+      }
+    }
 
     // Scene
     const scene = new THREE.Scene();
