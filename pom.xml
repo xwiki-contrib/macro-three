@@ -29,7 +29,7 @@
   </parent>
 
   <artifactId>macro-three</artifactId>
-  <version>1.0</version>
+  <version>1.1-SNAPSHOT</version>
   <packaging>xar</packaging>
   <name>Three Macro</name>
   <description>A macro for loading and displaying 3D objects in an XWiki page.</description>
@@ -62,7 +62,7 @@
     <connection>scm:git:git://github.com/xwiki-contrib/macro-three.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/macro-three.git</developerConnection>
     <url>https://github.com/xwiki-contrib/macro-three</url>
-    <tag>macro-three-1.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <build>
