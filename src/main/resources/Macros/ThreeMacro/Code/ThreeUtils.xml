@@ -290,9 +290,9 @@ requirejs.config({
     scene.add(new THREE.AmbientLight(0xf5f5f5));
 
     // Load the object
-    const file = $(container).data('file');
+    const files = $(container).data('files');
     const type = $(container).data('type');
-    loadObject(file, type, (object) =&gt; {
+    loadObject(files, type, (object) =&gt; {
       scene.add(object);
     });
 
@@ -300,9 +300,9 @@ requirejs.config({
   }
 
   // Load the object from file
-  function loadObject(file, type, onObjectLoaded) {
+  function loadObject(files, type, onObjectLoaded) {
     // Go over each file because files might be multiple
-    file.split(',').forEach(singleFile =&gt; {
+    files.forEach(singleFile =&gt; {
       singleFile = singleFile.trim();
       let fileType;
       if (!type) {

@@ -49,39 +49,40 @@ A macro for loading and displaying 3D objects in XWiki.
 === A file with custom background ===
 
 {{code}}
-{{three file="http://example.com/path/to/file.gltf" background="#ffffff" /}}
+{{three files="http://example.com/path/to/file.gltf" background="#ffffff" /}}
 {{/code}}
 
 **Result**
 
-{{three file="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf" background="#ffffff" /}}
+{{three files="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf" background="#ffffff" /}}
 
 === A file with custom height and width ===
 
 {{code}}
-{{three file="http://example.com/path/to/file.gltf" width="100%" height="600px" /}}
+{{three files="http://example.com/path/to/file.gltf" width="100%" height="600px" /}}
 {{/code}}
 
 **Result**
 
-{{three file="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf" width="100%" height="600px" /}}
+{{three files="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf" width="100%" height="600px" /}}
 
 === Using the current page's attachment ===
 
 {{code}}
-{{three file="bar.gltf" attachment="true" /}}
+{{three attachments="bar.gltf" /}}
 {{/code}}
 
 **Result**
 
-{{three file="bar.gltf" attachment="true" /}}
+{{three attachments="bar.gltf" /}}
 
 === Using a different page's attachment ===
 
-This will look for an attachment named "file.obj" in the document "Sandbox.ThreeMacro".
+This will look for an attachment named "file.obj" in the specified page.
 
 {{code}}
-{{three file="file.obj" attachment="true" document="Sandbox.ThreeMacro" /}}
+{{three attachments="Space.Page@file.obj" /}}
+{{three attachments="wiki:Space.Page@file.obj" /}}
 {{/code}}
 
 === Auto rotate the camera ===
@@ -89,12 +90,12 @@ This will look for an attachment named "file.obj" in the document "Sandbox.Three
 This will auto rotate the camera around the object. A custom (optional) auto rotate speed can also be set.
 
 {{code}}
-{{three file="bar.gltf" attachment="true" autoRotate="true" autoRotateSpeed="20" /}}
+{{three attachments="bar.gltf" autoRotate="true" autoRotateSpeed="20" /}}
 {{/code}}
 
 **Result**
 
-{{three file="bar.gltf" attachment="true" autoRotate="true" autoRotateSpeed="20" /}}
+{{three attachments="bar.gltf" autoRotate="true" autoRotateSpeed="20" /}}
 
 === Disable controls with custom zoom out ===
 
@@ -102,35 +103,34 @@ This will disable the controls and will not allow users to move around in the sc
 It will also set a custom initial distance from the object.
 
 {{code}}
-{{three file="bar.gltf" attachment="true" disableControls="true" type="gltf" defaultZoomOut="5" /}}
+{{three attachments="Macros.ThreeMacro.WebHome@bar.gltf" disableControls="true" type="gltf" defaultZoomOut="5" /}}
 {{/code}}
 
 **Result**
 
-{{three file="bar.gltf" attachment="true" disableControls="true" type="gltf" defaultZoomOut="5" /}}
+{{three attachments="Macros.ThreeMacro.WebHome@bar.gltf" disableControls="true" type="gltf" defaultZoomOut="5" /}}
 
 === Loading multiple files ===
 
-This will load multiple objects on same canvas.
+This will load multiple objects on the same canvas.
 
 {{code}}
-{{three files="file1.obj, file2.gltf" attachment="true" /}}
+{{three attachments="file1.obj, file2.gltf, Space.Page@file3.gltf" files="http://url.com/file1.gltf, http://url.com/file2.gltf" /}}
 {{/code}}
 
 == Parameters ==
 
 |=Name|=Mandatory|=(% style="width:15%" %)Values|=Default|=Description
-|**file**|**No**|*||3D object file to load. Supported formats are .obj, .gltf. URL to the 3D object file or name of the attachment if "attachment" parameter is true.
-|**files**|**No**|*||Multiple 3D object files to load separated by comma. Only either attachment names or URLs are supported in the same macro. Both can not be used in the same macro.
-|**type**|**No**|obj/gltf||Type of the object. Supported types are "obj", "gltf".
-|**attachment**|**No**|true/false|false|If the "file" or "files" are an attachment or not.
-|**document**|**No**|||The document to look into for attachment. Looks in current document by default. Requires "attachment" parameter to be "true".
+|**files**|**No**|*||3D object files to load from URL separated by comma. Supported formats are .obj, .gltf.
+|**attachments**|**No**|*||3D object files to load from attachments separated by comma. Supported formats are .obj, .gltf.
+**Syntax:** wiki:Space.Page@attachment.gltf, Space.Page@attachment.gltf, attachment.gltf
+|**type**|**No**|obj/gltf||Type of the object. Supported types are .obj, .gltf.
 |**width**|**No**|[0-9]+px or % |100%|Width of the canvas.
 |**height**|**No**|[0-9]+px or % |400px|Height of the canvas.
-|**defaultZoomOut**|**No**|[0-9]|10|Default value of how zoomed out (far) the camera initially is from the object.
+|**defaultZoomOut**|**No**|[0-9]+|10|Default value of how zoomed out (far) the camera initially is from the object.
 |**disableControls**|**No**|true/false|false|If the orbit controls used to move camera around the object should be disabled or not.
 |**autoRotate**|**No**|true/false|false|If the camera should auto rotate around the object or not.
-|**autoRotateSpeed**|**No**|[0-9]||Speed of the auto rotate.
+|**autoRotateSpeed**|**No**|[0-9]+||Speed of the auto rotate.
 |**background**|**No**||#000000|Background color of the canvas.</content>
   <attachment>
     <filename>bar.gltf</filename>
@@ -351,46 +351,18 @@ This will load multiple objects on same canvas.
   #if ($numbertool.toNumber($height).toString().equals($height))
     #set ($height = "${height}px")
   #end
-  ## Check if the file is specified to be an attachment
-  #if ($wikimacro.parameters.attachment)
-    ## Use the specified document for attachments if it is given else use the current document
-    #if ($wikimacro.parameters.document)
-      #set ($attachmentDoc = $xwiki.getDocument($wikimacro.parameters.document))
-    #else
-      #set ($attachmentDoc = $doc)
+  #set ($fileURLs = [])
+  ## Get URL of the attachments and put them into the main array
+  #if ($wikimacro.parameters.attachments)
+    #foreach ($attachment in $wikimacro.parameters.attachments)
+      #set ($attachmentURL = $xwiki.getURL($attachment))
+      #set ($discard = $fileURLs.add($attachmentURL))
     #end
-    ## Check if we have multiple files or a single file
-    #if ($wikimacro.parameters.file)
-      #set ($file = $attachmentDoc.getAttachmentURL($wikimacro.parameters.file))
-    #else
-      #set ($files = $wikimacro.parameters.files.split(','))
-      #set ($file = '')
-      ## Iterate over all the files and get their attachment URLs
-      #foreach ($singleFile in $files)
-        #set ($singleFile = $attachmentDoc.getAttachmentURL($singleFile.trim()))
-        #if ($foreach.count == 1)
-          #set ($file = "${singleFile}")
-        #else
-          #set ($file = "${file},${singleFile}")
-        #end
-      #end
-    #end
-  #else
-    ## If the file or files are not an attachment
-    #if ($!wikimacro.parameters.file)
-      #set ($file = $wikimacro.parameters.file)
-    #else
-      #set ($files = $wikimacro.parameters.files.split(','))
-      #set ($file = '')
-      ## Iterate over all the files and get their attachment URLs
-      #foreach ($singleFile in $files)
-        #set ($singleFile = $singleFile.trim())
-        #if ($foreach.count == 1)
-          #set ($file = "${singleFile}")
-        #else
-          #set ($file = "${file},${singleFile}")
-        #end
-      #end
+  #end
+  ## Put the file URLs into the main array
+  #if ($wikimacro.parameters.files)
+    #foreach ($fileURL in $wikimacro.parameters.files)
+      #set ($discard = $fileURLs.add($fileURL))
     #end
   #end
   #set ($canvasId = $util.generateRandomString(5))
@@ -398,7 +370,7 @@ This will load multiple objects on same canvas.
     id="threeCanvas${canvasId}"
     class="macro-three-container"
     style="width: ${width}; height: ${height}"
-    data-file="${file}"
+    data-files='${jsontool.serialize(${fileURLs})}'
     data-type="$!wikimacro.parameters.type"
     data-zoom-out="$!wikimacro.parameters.defaultZoomOut"
     data-background="$!wikimacro.parameters.background"
@@ -416,7 +388,7 @@ This will load multiple objects on same canvas.
       <contentJavaType/>
     </property>
     <property>
-      <contentType>Optional</contentType>
+      <contentType>No content</contentType>
     </property>
     <property>
       <defaultCategory/>
@@ -435,84 +407,6 @@ This will load multiple objects on same canvas.
     </property>
     <property>
       <visibility>Current Wiki</visibility>
-    </property>
-  </object>
-  <object>
-    <name>Macros.ThreeMacro.WebHome</name>
-    <number>0</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>261ca4d4-bbb9-46b6-ab0d-743f102cbcfd</guid>
-    <class>
-      <name>XWiki.WikiMacroParameterClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <defaultValue>
-        <disabled>0</disabled>
-        <name>defaultValue</name>
-        <number>4</number>
-        <prettyName>Parameter default value</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultValue>
-      <description>
-        <disabled>0</disabled>
-        <name>description</name>
-        <number>2</number>
-        <prettyName>Parameter description</prettyName>
-        <rows>5</rows>
-        <size>40</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </description>
-      <mandatory>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>mandatory</name>
-        <number>3</number>
-        <prettyName>Parameter mandatory</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </mandatory>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Parameter name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <type>
-        <disabled>0</disabled>
-        <name>type</name>
-        <number>5</number>
-        <prettyName>Parameter type</prettyName>
-        <size>60</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </type>
-    </class>
-    <property>
-      <defaultValue/>
-    </property>
-    <property>
-      <description>3D object file to load. Supported formats are .obj, .gltf.</description>
-    </property>
-    <property>
-      <mandatory>0</mandatory>
-    </property>
-    <property>
-      <name>file</name>
-    </property>
-    <property>
-      <type>java.lang.String</type>
     </property>
   </object>
   <object>
@@ -669,162 +563,6 @@ This will load multiple objects on same canvas.
     </property>
     <property>
       <type/>
-    </property>
-  </object>
-  <object>
-    <name>Macros.ThreeMacro.WebHome</name>
-    <number>3</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>8271abde-e2a2-4c74-9376-1a05d031b918</guid>
-    <class>
-      <name>XWiki.WikiMacroParameterClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <defaultValue>
-        <disabled>0</disabled>
-        <name>defaultValue</name>
-        <number>4</number>
-        <prettyName>Parameter default value</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultValue>
-      <description>
-        <disabled>0</disabled>
-        <name>description</name>
-        <number>2</number>
-        <prettyName>Parameter description</prettyName>
-        <rows>5</rows>
-        <size>40</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </description>
-      <mandatory>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>mandatory</name>
-        <number>3</number>
-        <prettyName>Parameter mandatory</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </mandatory>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Parameter name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <type>
-        <disabled>0</disabled>
-        <name>type</name>
-        <number>5</number>
-        <prettyName>Parameter type</prettyName>
-        <size>60</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </type>
-    </class>
-    <property>
-      <defaultValue>false</defaultValue>
-    </property>
-    <property>
-      <description>If the "file" or "files" are an attachment or not.</description>
-    </property>
-    <property>
-      <mandatory>0</mandatory>
-    </property>
-    <property>
-      <name>attachment</name>
-    </property>
-    <property>
-      <type>java.lang.Boolean</type>
-    </property>
-  </object>
-  <object>
-    <name>Macros.ThreeMacro.WebHome</name>
-    <number>4</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>76f038ea-f867-471a-a560-179cff9f448d</guid>
-    <class>
-      <name>XWiki.WikiMacroParameterClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <defaultValue>
-        <disabled>0</disabled>
-        <name>defaultValue</name>
-        <number>4</number>
-        <prettyName>Parameter default value</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultValue>
-      <description>
-        <disabled>0</disabled>
-        <name>description</name>
-        <number>2</number>
-        <prettyName>Parameter description</prettyName>
-        <rows>5</rows>
-        <size>40</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </description>
-      <mandatory>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>mandatory</name>
-        <number>3</number>
-        <prettyName>Parameter mandatory</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </mandatory>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Parameter name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <type>
-        <disabled>0</disabled>
-        <name>type</name>
-        <number>5</number>
-        <prettyName>Parameter type</prettyName>
-        <size>60</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </type>
-    </class>
-    <property>
-      <defaultValue/>
-    </property>
-    <property>
-      <description>Requires "attachment" to be "true". The document to look into for attachment. Looks in current document by default.</description>
-    </property>
-    <property>
-      <mandatory>0</mandatory>
-    </property>
-    <property>
-      <name>document</name>
-    </property>
-    <property>
-      <type>org.xwiki.model.reference.DocumentReference</type>
     </property>
   </object>
   <object>
@@ -1205,7 +943,7 @@ This will load multiple objects on same canvas.
       <defaultValue/>
     </property>
     <property>
-      <description>Multiple 3D object files to load separated by comma. Supported formats are .obj, .gltf.</description>
+      <description>3D object files to load from URL separated by comma. Supported formats are .obj, .gltf.</description>
     </property>
     <property>
       <mandatory>0</mandatory>
@@ -1214,7 +952,7 @@ This will load multiple objects on same canvas.
       <name>files</name>
     </property>
     <property>
-      <type>java.lang.String</type>
+      <type>java.util.List&lt;java.lang.String&gt;</type>
     </property>
   </object>
   <object>
@@ -1371,6 +1109,86 @@ This will load multiple objects on same canvas.
     </property>
     <property>
       <type>java.lang.String</type>
+    </property>
+  </object>
+  <object>
+    <name>Macros.ThreeMacro.WebHome</name>
+    <number>13</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>601aa87e-c804-4006-a7e4-bd7c3229d1e0</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>3D object files to load from attachments separated by comma. Supported formats are .obj, .gltf.
+
+Syntax: wiki:Space.Page@attachment.gltf, Space.Page@attachment.gltf, attachment.gltf</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>attachments</name>
+    </property>
+    <property>
+      <type>java.util.List&lt;org.xwiki.model.reference.AttachmentReference&gt;</type>
     </property>
   </object>
 </xwikidoc>
