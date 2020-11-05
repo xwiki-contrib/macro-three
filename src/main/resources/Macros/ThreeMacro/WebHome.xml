@@ -49,40 +49,40 @@ A macro for loading and displaying 3D objects in XWiki.
 === A file with custom background ===
 
 {{code}}
-{{three files="http://example.com/path/to/file.gltf" background="#ffffff" /}}
+{{three ref="http://example.com/path/to/file.gltf" background="#ffffff" /}}
 {{/code}}
 
 **Result**
 
-{{three files="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf" background="#ffffff" /}}
+{{three ref="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf" background="#ffffff" /}}
 
 === A file with custom height and width ===
 
 {{code}}
-{{three files="http://example.com/path/to/file.gltf" width="100%" height="600px" /}}
+{{three ref="http://example.com/path/to/file.gltf" width="100%" height="600px" /}}
 {{/code}}
 
 **Result**
 
-{{three files="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf" width="100%" height="600px" /}}
+{{three ref="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf" width="100%" height="600px" /}}
 
 === Using the current page's attachment ===
 
 {{code}}
-{{three attachments="bar.gltf" /}}
+{{three attachmentRef="bar.gltf" /}}
 {{/code}}
 
 **Result**
 
-{{three attachments="bar.gltf" /}}
+{{three attachmentRef="bar.gltf" /}}
 
 === Using a different page's attachment ===
 
 This will look for an attachment named "file.obj" in the specified page.
 
 {{code}}
-{{three attachments="Space.Page@file.obj" /}}
-{{three attachments="wiki:Space.Page@file.obj" /}}
+{{three attachmentRef="Space.Page@file.obj" /}}
+{{three attachmentRef="wiki:Space.Page@file.obj" /}}
 {{/code}}
 
 === Auto rotate the camera ===
@@ -90,12 +90,12 @@ This will look for an attachment named "file.obj" in the specified page.
 This will auto rotate the camera around the object. A custom (optional) auto rotate speed can also be set.
 
 {{code}}
-{{three attachments="bar.gltf" autoRotate="true" autoRotateSpeed="20" /}}
+{{three attachmentRef="bar.gltf" autoRotate="true" autoRotateSpeed="20" /}}
 {{/code}}
 
 **Result**
 
-{{three attachments="bar.gltf" autoRotate="true" autoRotateSpeed="20" /}}
+{{three attachmentRef="bar.gltf" autoRotate="true" autoRotateSpeed="20" /}}
 
 === Disable controls with custom zoom out ===
 
@@ -103,26 +103,26 @@ This will disable the controls and will not allow users to move around in the sc
 It will also set a custom initial distance from the object.
 
 {{code}}
-{{three attachments="Macros.ThreeMacro.WebHome@bar.gltf" disableControls="true" type="gltf" defaultZoomOut="5" /}}
+{{three attachmentRef="Macros.ThreeMacro.WebHome@bar.gltf" disableControls="true" type="gltf" defaultZoomOut="5" /}}
 {{/code}}
 
 **Result**
 
-{{three attachments="Macros.ThreeMacro.WebHome@bar.gltf" disableControls="true" type="gltf" defaultZoomOut="5" /}}
+{{three attachmentRef="Macros.ThreeMacro.WebHome@bar.gltf" disableControls="true" type="gltf" defaultZoomOut="5" /}}
 
 === Loading multiple files ===
 
 This will load multiple objects on the same canvas.
 
 {{code}}
-{{three attachments="file1.obj, file2.gltf, Space.Page@file3.gltf" files="http://url.com/file1.gltf, http://url.com/file2.gltf" /}}
+{{three attachmentRef="file1.obj, file2.gltf, Space.Page@file3.gltf" ref="http://url.com/file1.gltf, http://url.com/file2.gltf" /}}
 {{/code}}
 
 == Parameters ==
 
 |=Name|=Mandatory|=(% style="width:15%" %)Values|=Default|=Description
-|**files**|**No**|*||3D object files to load from URL separated by comma. Supported formats are .obj, .gltf.
-|**attachments**|**No**|*||3D object files to load from attachments separated by comma. Supported formats are .obj, .gltf.
+|**ref**|**No**|*||Reference to 3D object files to load from URL separated by comma. Supported formats are .obj, .gltf.
+|**attachmentRef**|**No**|*||Reference to 3D object files to load from attachments separated by comma. Supported formats are .obj, .gltf.
 **Syntax:** wiki:Space.Page@attachment.gltf, Space.Page@attachment.gltf, attachment.gltf
 |**type**|**No**|obj/gltf||Type of the object. Supported types are .obj, .gltf.
 |**width**|**No**|[0-9]+px or % |100%|Width of the canvas.
@@ -353,15 +353,15 @@ This will load multiple objects on the same canvas.
   #end
   #set ($fileURLs = [])
   ## Get URL of the attachments and put them into the main array
-  #if ($wikimacro.parameters.attachments)
-    #foreach ($attachment in $wikimacro.parameters.attachments)
+  #if ($wikimacro.parameters.attachmentRef)
+    #foreach ($attachment in $wikimacro.parameters.attachmentRef)
       #set ($attachmentURL = $xwiki.getURL($attachment))
       #set ($discard = $fileURLs.add($attachmentURL))
     #end
   #end
   ## Put the file URLs into the main array
-  #if ($wikimacro.parameters.files)
-    #foreach ($fileURL in $wikimacro.parameters.files)
+  #if ($wikimacro.parameters.ref)
+    #foreach ($fileURL in $wikimacro.parameters.ref)
       #set ($discard = $fileURLs.add($fileURL))
     #end
   #end
@@ -943,13 +943,13 @@ This will load multiple objects on the same canvas.
       <defaultValue/>
     </property>
     <property>
-      <description>3D object files to load from URL separated by comma. Supported formats are .obj, .gltf.</description>
+      <description>Reference to 3D object files to load from URL separated by comma. Supported formats are .obj, .gltf.</description>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
-      <name>files</name>
+      <name>ref</name>
     </property>
     <property>
       <type>java.util.List&lt;java.lang.String&gt;</type>
@@ -1177,7 +1177,7 @@ This will load multiple objects on the same canvas.
       <defaultValue/>
     </property>
     <property>
-      <description>3D object files to load from attachments separated by comma. Supported formats are .obj, .gltf.
+      <description>Reference to 3D object files to load from attachments separated by comma. Supported formats are .obj, .gltf.
 
 Syntax: wiki:Space.Page@attachment.gltf, Space.Page@attachment.gltf, attachment.gltf</description>
     </property>
@@ -1185,7 +1185,7 @@ Syntax: wiki:Space.Page@attachment.gltf, Space.Page@attachment.gltf, attachment.
       <mandatory>0</mandatory>
     </property>
     <property>
-      <name>attachments</name>
+      <name>attachmentRef</name>
     </property>
     <property>
       <type>java.util.List&lt;org.xwiki.model.reference.AttachmentReference&gt;</type>
