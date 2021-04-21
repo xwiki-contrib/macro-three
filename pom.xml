@@ -39,6 +39,11 @@
     <xwiki.extension.category>macro</xwiki.extension.category>
     <xwiki.release.jira.skip>false</xwiki.release.jira.skip>
     <xwiki.issueManagement.jira.id>THREE</xwiki.issueManagement.jira.id>
+
+    <!-- Components -->
+    <xwiki.extension.components>
+      org.xwiki.rendering.macro.Macro/three
+    </xwiki.extension.components>
   </properties>
 
   <dependencies>
